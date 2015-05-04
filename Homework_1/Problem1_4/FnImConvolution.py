@@ -1,7 +1,7 @@
 def FnImConvol( OriginImage, Kernel, Padding ) :
     "This function is to perform 2D convoluttion"
     
-    ## Function Name: FnImConvol
+    ## Function Name: FnImConvol ******************************************
     #
     # Description: Function of 2D convolution
     # Author: Wonatek Lim ( lwt1849@gmail.com )
