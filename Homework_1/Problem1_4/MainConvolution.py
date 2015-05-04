@@ -6,6 +6,7 @@ from scipy import misc
 import FnImConvolution
 
 
+
 # Sample image
 TestImage1 = misc.lena()
 
