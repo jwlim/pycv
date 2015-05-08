@@ -40,6 +40,8 @@ def backward_warping(src, dst, H_inv):
                 
 #Making homography matrix
 
+print 'making homography matrix'
+
 tx = 10
 ty = 30
 theta = 60
@@ -49,13 +51,43 @@ phi = 30
 lamda1 = 2
 lamda2 = 1
 
+H = func_homographyMatrix.make_homography(tx)
+
 H_translation = func_homographyMatrix.make_homography(tx, ty)
+print 'tx = ', tx
+print 'ty = ', ty
+print '\nH_translation = \n', H_translation
+print '---------------------------------------------------'
+
 H_euclidean = func_homographyMatrix.make_homography(tx, ty, theta)
+print 'tx = ', tx
+print 'ty = ', ty
+print 'theta = ', theta
+print '\nH_euclidean = \n', H_euclidean
+print '---------------------------------------------------'
+
 H_similarity = func_homographyMatrix.make_homography(tx, ty, theta, s)
+print 'tx = ' ,tx
+print 'ty = ', ty
+print 'theta = ', theta
+print 's = ', s
+print '\nH_similarity = \n', H_similarity
+print '---------------------------------------------------'
+
 H_affine = func_homographyMatrix.make_homography(tx, ty, theta, phi, lamda1, lamda2)
+print 'tx = ', tx
+print 'ty = ', ty
+print 'theta = ', theta
+print 'phi = ', phi
+print 'lamda1 = ', lamda1
+print 'lamda2 = ', lamda2
+print '\nH_affine = \n', H_affine
+print '---------------------------------------------------'
 
 
 #Image warping using homography matrix
+
+print 'image warping using homography matrix\n'
 
 img_src = scipy.misc.lena()
 height = img_src.shape[0]
@@ -73,6 +105,13 @@ theta = 45
 phi = 20
 lamda1 = 1
 lamda2 = 0.5
+
+print 'tx = ', tx
+print 'ty = ', ty
+print 'theta = ', theta
+print 'phi = ', phi
+print 'lamda1 = ', lamda1
+print 'lamda2 = ', lamda2
 
 H = func_homographyMatrix.make_homography(tx, ty, theta, phi, lamda1, lamda2)
 H_inv = numpy.linalg.inv(H)
