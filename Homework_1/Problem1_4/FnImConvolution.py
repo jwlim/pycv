@@ -15,93 +15,62 @@ def FnImConvol( OriginImage, Kernel, Padding ) :
     #***********************************************************************
     
     import math
-    #from numpy import*
+    import sys
     import numpy as np
     
     # 1. Get ImageSize, KernelSize
     [ ImWidth, ImHeight] = OriginImage.shape;
     [ KerWidth, KerHeight] = Kernel.shape;
     
-    HalfWidthKernel = math.ceil( KerWidth/2 )
-    HalfHeightKernel = math.ceil( KerHeight/2 )
+    NumLeftAddedCol = math.trunc(float(KerWidth)/2)
+    NumRightAddedCol = math.trunc(float(KerWidth)/2)
+    if ( KerWidth % 2 ) == 0:
+        # Even number
+        NumLeftAddedCol = NumLeftAddedCol - 1
     
-    # 2. Create result array
-    FilteredImage = np.zeros( (ImWidth, ImHeight) )
+    NumUpAddedRow = math.trunc(float(KerHeight)/2)
+    NumDnAddedRow = math.trunc(float(KerHeight)/2)
+    if ( KerHeight % 2 ) == 0:
+    # Even number
+        NumUpAddedRow = NumUpAddedRow - 1
+
+    if KerWidth != KerHeight:
+        print "Kernel should be square matrix!"
+        sys.exit()
+
+
+    # 2. Create padded image
+    ExtendedCol = ImWidth+KerWidth-1
+    ExtendedRow = ImHeight+KerHeight-1
+    ExtendedImage = np.zeros( (ExtendedCol, ExtendedRow) )
+    
+    if Padding == 'wrap':
+        ExtendedImage = np.lib.pad( OriginImage, (NumLeftAddedCol, NumRightAddedCol), 'wrap')
+    
+    elif Padding == 'clamp':
+        ExtendedImage = np.lib.pad( OriginImage, (NumLeftAddedCol, NumRightAddedCol), 'edge')
+
+    elif Padding == 'mirror':
+        ExtendedImage = np.lib.pad( OriginImage, (NumLeftAddedCol, NumRightAddedCol), 'symmetric')
+
+    else:
+        ExtendedImage = np.lib.pad( OriginImage, (NumLeftAddedCol, NumRightAddedCol), 'constant', constant_values = (0,0) )
+    
     
     # 3. 2D Convolution
+    FilteredImage = np.zeros( (ImWidth, ImHeight) ) # Create result array
     for ImageIndexX in range(ImWidth):
+        ExImageIndexX = ImageIndexX + NumLeftAddedCol
+
         for ImageIndexY in range(ImHeight):
-            
-            AccumedValue = 0.0
-            
-            for KernelIndexX in range(KerWidth):
-                ConvImIndexX = int( ImageIndexX - HalfWidthKernel + KernelIndexX )
+            ExImageIndexY = ImageIndexY + NumUpAddedRow
 
-                for KernelIndexY in range(KerHeight):
-                    ConvImIndexY = int( ImageIndexY - HalfHeightKernel + KernelIndexY )
-                    
-                    # 03-1. Padding: zero
-                    if Padding == 'zero':
-                        if (ConvImIndexX >= 0 ) and (ConvImIndexY >= 0) and (ConvImIndexX < ImWidth) and (ConvImIndexY < ImHeight):
-                            SumVal = OriginImage[ConvImIndexX, ConvImIndexY] * Kernel[KernelIndexX, KernelIndexY]
-                            AccumedValue = AccumedValue + SumVal
-        
-                    # 03-2. Padding: wrap
-                    elif Padding == 'wrap':
-                        if ConvImIndexX < 0:
-                            ConvImIndexX = ConvImIndexX + ImWidth
-                        elif ConvImIndexX >= ImWidth:
-                            ConvImIndexX = ConvImIndexX - ImWidth
-        
-                        if ConvImIndexY < 0:
-                            ConvImIndexY = ConvImIndexY + ImHeight
-                        elif ConvImIndexY >= ImHeight:
-                            ConvImIndexY = ConvImIndexY - ImHeight
-        
-                        SumVal = OriginImage[ConvImIndexX, ConvImIndexY] * Kernel[KernelIndexX, KernelIndexY]
-                        AccumedValue = AccumedValue + SumVal
-        
-        
-                    # 03-3. Padding: clamp
-                    elif Padding == 'clamp':
-                        if ConvImIndexX < 0:
-                            ConvImIndexX = 0
-                        elif ConvImIndexX >= ImWidth:
-                            ConvImIndexX = ImWidth - 1
-                                
-                        if ConvImIndexY < 0:
-                            ConvImIndexY = 0
-                        elif ConvImIndexY >= ImHeight:
-                            ConvImIndexY = ImHeight - 1
-                                
-                        SumVal = OriginImage[ConvImIndexX, ConvImIndexY] * Kernel[KernelIndexX, KernelIndexY]
-                        AccumedValue = AccumedValue + SumVal
+            ObjImg = ExtendedImage[ ( ExImageIndexX-NumLeftAddedCol ):( ExImageIndexX+NumRightAddedCol+1),
+                                   ( ExImageIndexY-NumUpAddedRow ):( ExImageIndexY+NumDnAddedRow+1 )]
 
+            AccumedValue = np.sum( np.multiply( ObjImg, Kernel ) )
 
-                    # 03-4. Padding: mirror
-                    elif Padding == 'mirror':
-                        if ConvImIndexX < 0:
-                            ConvImIndexX = abs(ConvImIndexX) - 1
-                        elif ConvImIndexX >= ImWidth:
-                            ConvImIndexX = ImWidth - ConvImIndexX
-                                
-                        if ConvImIndexY < 0:
-                            ConvImIndexY = abs(ConvImIndexY) - 1
-                        elif ConvImIndexY >= ImHeight:
-                            ConvImIndexY = ImHeight - ConvImIndexY
-
-                        SumVal = OriginImage[ConvImIndexX, ConvImIndexY] * Kernel[KernelIndexX, KernelIndexY]
-                        AccumedValue = AccumedValue + SumVal
-        
-        
-                    # --. Default Padding: zero
-                    else:
-                        if (ConvImIndexX >= 0 ) and (ConvImIndexY >= 0) and (ConvImIndexX < ImWidth) and (ConvImIndexY < ImHeight):
-                            SumVal = OriginImage[ConvImIndexX, ConvImIndexY] * Kernel[KernelIndexX, KernelIndexY]
-                            AccumedValue = AccumedValue + SumVal
-        
             # Update value
             FilteredImage[ImageIndexX, ImageIndexY] = AccumedValue
-
 
     return FilteredImage
