@@ -1,4 +1,4 @@
-
+import func_homographyMatrix
 import math
 import numpy
 
@@ -31,11 +31,30 @@ def convert_affine_from_general(a1, a2, a3, a4, a5, a6):
 
 
     #Get theta
-    theta_rad = numpy.arcsin(R_theta[1,0])
-    theta_deg = numpy.degrees(theta_rad)
+    sin_theta = R_theta[1, 0]
+    cos_theta = R_theta[0, 0]
+
+    if cos_theta == 0:
+        theta_rad = numpy.arcsin(sin_theta)
+
+    else:
+        tan_theta = sin_theta / cos_theta
+        theta_rad = numpy.arctan(tan_theta)
+
+    theta_deg = numpy.degrees(theta_rad)        
     
     #Get phi
-    phi_rad = numpy.arcsin(R_phi[1,0])
+    sin_phi = R_phi[1, 0]
+    cos_phi = R_phi[0, 0]
+
+    if cos_phi == 0:
+        phi_rad = numpy.arcsin(sin_phi)
+                
+    else:
+        tan_phi = sin_phi / cos_phi
+        phi_rad = numpy.arctan(tan_phi)
+        
+
     phi_deg = numpy.degrees(phi_rad)
 
     tx = a3
@@ -43,55 +62,20 @@ def convert_affine_from_general(a1, a2, a3, a4, a5, a6):
 
     lamda1 = D[0,0]
     lamda2 = D[1,1]
-
-    print '\nconvert_affine_from_general\n'
-    print 'tx = ', tx
-    print 'ty = ', ty
-    print 'theta_degree = ', theta_deg
-    print 'phi_degree = ', phi_deg
-    print 'lamda1 = ',lamda1
-    print 'lamda2 = ',lamda2
     
     return tx, ty, theta_deg, phi_deg, lamda1, lamda2
 
 
 def convert_affine_to_general(tx, ty, theta, phi, lamda1, lamda2):    
     
-    theta_rad = math.radians(theta)
-    phi_rad = math.radians(phi)
+    H = func_homographyMatrix.make_homography(tx, ty, theta, phi, lamda1, lamda2)
     
-    R_theta = numpy.matrix(((math.cos(theta_rad), -math.sin(theta_rad)),
-                            (math.sin(theta_rad), math.cos(theta_rad))))
-
-    R_phi = numpy.matrix(((math.cos(phi_rad), -math.sin(phi_rad)),
-                          (math.sin(phi_rad), math.cos(phi_rad))))
-
-          
-    D = numpy.matrix(((lamda1, 0),
-                      (0, lamda2)))
-
-    A = R_theta * R_phi.T * D * R_phi
-    
-    a1=A[0,0]
-    a2=A[0,1]
+    a1=H[0,0]
+    a2=H[0,1]
     a3=tx
-    a4=A[1,0]
-    a5=A[1,1]
+    a4=H[1,0]
+    a5=H[1,1]
     a6=ty
-
-    H_A = numpy.matrix(((a1, a2, a3),
-                        (a4, a5, a6),
-                        (0, 0, 1)))
-    
-    print '\nconvert_affine_to_general\n'
-    print 'tx = ', tx
-    print 'ty = ', ty
-    print 'theta_degree = ', theta
-    print 'phi_degree = ', phi
-    print 'lamda1 = ',lamda1
-    print 'lamda2 = ',lamda2
-    
-    print '\nH_A =\n', H_A
     
     return a1, a2, a3, a4, a5, a6
 
