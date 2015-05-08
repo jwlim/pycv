@@ -6,11 +6,9 @@ import numpy
 def make_homography(a, *arg):
 
     arg_size = len(arg)+1
-    print 'arg size =', arg_size
 
     #Translation
     if arg_size == 2:
-        print 'Translation transformation'
         tx = a
         ty = arg[0]
         
@@ -18,17 +16,10 @@ def make_homography(a, *arg):
                          (0, 1, ty),
                          (0, 0, 1)))
         
-
-        print '\ntx = ', tx
-        print 'ty = ', ty
-        
-        print '\nH = \n', H
-        print '---------------------------------------------------'
         return H
 
     #Euclidean
     elif arg_size == 3:
-        print 'Euclidean transformation'
         tx = a
         ty = arg[0]
         theta_rad = math.radians(arg[1])
@@ -37,17 +28,10 @@ def make_homography(a, *arg):
                          (math.sin(theta_rad), math.cos(theta_rad), ty),
                          (0, 0, 1)))
 
-        print '\ntx = ', tx
-        print 'ty = ', ty
-        print 'theta_degree = ', arg[1]
-        
-        print '\nH = \n', H
-        print '---------------------------------------------------'
         return H
 
     #Similarity
     elif arg_size == 4:
-        print 'Similarity transformation'
         tx = a
         ty = arg[0]
         theta_rad = math.radians(arg[1])
@@ -57,18 +41,10 @@ def make_homography(a, *arg):
                          (math.sin(theta_rad), s*math.cos(theta_rad), ty),
                          (0, 0, 1)))
 
-        print '\ntx = ', tx
-        print 'ty = ', ty
-        print 'theta_degree = ', arg[1]
-        print 's = ', s
-        
-        print '\nH = \n', H
-        print '---------------------------------------------------'
         return H
 
     #Affine
     elif arg_size == 6:
-        print 'Affine transformation'
         tx = a
         ty = arg[0]
         theta_rad = math.radians(arg[1])
@@ -91,16 +67,6 @@ def make_homography(a, *arg):
                          (A[1,0], A[1,1], ty),
                          (0, 0, 1)))
 
-       
-        print '\ntx = ', tx
-        print 'ty = ', ty
-        print 'theta_degree = ', arg[1]
-        print 'phi_degree = ', arg[2]
-        print 'lamda1 = ',lamda1
-        print 'lamda2 = ',lamda2
-                              
-        print '\nH = \n', H
-        print '---------------------------------------------------'
         return H                     
     
     else:
