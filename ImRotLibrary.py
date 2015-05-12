@@ -10,14 +10,14 @@
 #--------------------------------------------------------------------------------
 
 # import the basic librarires
-from math import atan2, cos, sin, sqrt
+from math import atan2, cos, sin, sqrt, pi
 from numpy import float64, hypot, zeros, flatnonzero, array
 
 # Makes 3D rotation matrices from axis/angle
 def Fn_AxisAngle2RotMat(matrix, axis, angle):
     # Trig factors.
-    ca = cos(angle)
-    sa = sin(angle)
+    ca = cos(pi*angle/180)
+    sa = sin(pi*angle/180)
     C = 1 - ca
 
     # Depack the axis.
@@ -84,7 +84,7 @@ def Fn_RotMat2AxisAngle(matrix):
     # Angle.
     r = hypot(axis[0], hypot(axis[1], axis[2]))
     t = matrix[0,0] + matrix[1,1] + matrix[2,2]
-    theta = atan2(r, t-1)
+    theta = 180*atan2(r, t-1)/pi
 
     # Normalise the axis.
     axis = axis / r
